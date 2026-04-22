@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo de Adivinhação — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2ee; --bg2: #edeae4; --card: #ffffff; --text: #1a1714; --text2: #6b6560;
+    --accent: #d4501a; --accent2: #2a5c8f; --border: #d8d3cc;
+    --bronze: #cd7f32; --prata: #a8a9ad; --ouro: #ffd700; --diamante: #b9f2ff;
+    --shadow: 0 2px 20px rgba(0,0,0,0.06); --radius: 16px;
+  }
+  [data-theme="dark"] {
+    --bg: #12100e; --bg2: #1c1916; --card: #221f1b; --text: #f0ece6; --text2: #9a9390;
+    --accent: #e8663a; --accent2: #4a8bbf; --border: #2e2a25;
+    --shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Mono', monospace; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 24px 40px; border-bottom: 1px solid var(--border); background: var(--card); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .theme-toggle { background: var(--bg2); border: 1px solid var(--border); border-radius: 50px; padding: 8px 16px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text); transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+  nav { display: flex; padding: 0 40px; background: var(--card); border-bottom: 1px solid var(--border); gap: 4px; }
+  .tab { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.85rem; padding: 16px 24px; cursor: pointer; border: none; background: transparent; color: var(--text2); letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  main { max-width: 1100px; margin: 0 auto; padding: 40px; }
+  .page { display: none; animation: fadeIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .section-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem; margin-bottom: 8px; letter-spacing: -1px; }
+  .section-sub { color: var(--text2); font-size: 0.85rem; margin-bottom: 32px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+  .card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2); }
+  .profile-grid { display: grid; grid-template-columns: 300px 1fr; gap: 24px; }
+  .profile-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px 28px; box-shadow: var(--shadow); text-align: center; }
+  .avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem; color: white; }
+  .profile-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.4rem; margin-bottom: 4px; text-transform: capitalize; }
+  .profile-badge { display: inline-block; background: var(--bg2); border: 1px solid var(--border); border-radius: 50px; padding: 4px 14px; font-size: 0.75rem; color: var(--text2); margin-bottom: 24px; }
+  .profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+  .stat-box { background: var(--bg2); border-radius: 10px; padding: 14px; text-align: center; }
+  .stat-value { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; color: var(--accent); }
+  .stat-label { font-size: 0.7rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .profile-right { display: flex; flex-direction: column; gap: 24px; }
+  .conquistas-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .conquista-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; transition: all 0.2s; }
+  .conquista-item.desbloqueada { background: var(--card); border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .conquista-item.bloqueada { opacity: 0.4; filter: grayscale(1); }
+  .conquista-emoji { font-size: 2rem; margin-bottom: 8px; }
+  .conquista-nome { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; }
+  .conquista-pts { font-size: 0.7rem; color: var(--text2); margin-top: 2px; }
+  .historico-list { display: flex; flex-direction: column; gap: 10px; }
+  .historico-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--bg2); border-radius: 10px; border: 1px solid var(--border); }
+  .dificuldade-badge { display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-facil { background: #d4edda; color: #155724; }
+  .badge-medio { background: #fff3cd; color: #856404; }
+  .badge-dificil { background: #f8d7da; color: #721c24; }
+  [data-theme="dark"] .badge-facil { background: #1a3a24; color: #6fcf97; }
+  [data-theme="dark"] .badge-medio { background: #3a3010; color: #f2c94c; }
+  [data-theme="dark"] .badge-dificil { background: #3a1a1a; color: #eb5757; }
+  .ranking-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .ranking-filters { display: flex; gap: 8px; }
+  .filter-btn { background: var(--bg2); border: 1px solid var(--border); border-radius: 50px; padding: 6px 16px; font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--text2); cursor: pointer; transition: all 0.2s; }
+  .filter-btn:hover, .filter-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .ranking-table { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .ranking-row { display: grid; grid-template-columns: 60px 1fr 120px 100px 120px 100px; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--border); transition: background 0.15s; gap: 8px; }
+  .ranking-row:last-child { border-bottom: none; }
+  .ranking-row:hover { background: var(--bg2); }
+  .ranking-row.header { background: var(--bg2); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text2); font-weight: 500; }
+  .rank-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--text2); }
+  .rank-name { font-family: 'Syne', sans-serif; font-weight: 600; text-transform: capitalize; font-size: 0.95rem; }
+  .rank-points { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--accent); font-size: 1rem; }
+  .rank-conquistas { font-size: 1.1rem; letter-spacing: 2px; }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 16px; }
+  .empty-state h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 8px; }
+  .player-selector { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; flex-wrap: wrap; }
+  .player-chip { display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 50px; padding: 8px 16px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text2); transition: all 0.2s; text-transform: capitalize; }
+  .player-chip:hover, .player-chip.active { border-color: var(--accent); color: var(--accent); background: var(--bg2); }
+  .player-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); opacity: 0; transition: opacity 0.2s; }
+  .player-chip.active .dot { opacity: 1; }
+  .btn-jogar { padding: 12px 24px; background: var(--accent); color: white; border: none; border-radius: 10px; font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: opacity 0.2s; }
+  .btn-jogar:hover { opacity: 0.85; }
+  .btn-secondary { padding: 12px 24px; background: var(--bg2); color: var(--text2); border: 1px solid var(--border); border-radius: 10px; font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+  .btn-secondary:hover { background: var(--border); }
+
+  /* TELA INICIAL */
+  #tela-inicial {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--bg); display: flex; align-items: center; justify-content: center;
+    z-index: 999; flex-direction: column; text-align: center; padding: 20px;
+    animation: fadeIn 0.5s ease;
+  }
+  #tela-inicial .boas-vindas {
+    font-family: 'DM Mono', monospace; font-size: 0.9rem; color: var(--text2);
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px;
+  }
+  #tela-inicial .titulo-jogo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 3.5rem;
+    letter-spacing: -2px; margin-bottom: 8px; line-height: 1;
+  }
+  #tela-inicial .titulo-jogo span { color: var(--accent); }
+  #tela-inicial .subtitulo {
+    color: var(--text2); font-size: 0.85rem; margin-bottom: 40px;
+  }
+  #tela-inicial .input-wrap {
+    display: flex; gap: 8px; width: 100%; max-width: 400px; margin-bottom: 12px;
+  }
+  #tela-inicial input {
+    flex: 1; padding: 14px 18px; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--card); color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: 1rem; box-shadow: var(--shadow);
+  }
+  #tela-inicial .erro { color: #e74c3c; font-size: 0.8rem; min-height: 20px; }
+  #app { display: none; }
+</style>
+</head>
+<body>
+
+<!-- TELA INICIAL -->
+<div id="tela-inicial">
+  <div class="boas-vindas">✦ Bem vindo ✦</div>
+  <div class="titulo-jogo">Adivinha<span>.</span>py</div>
+  <p class="subtitulo">Tente adivinhar o número secreto!</p>
+  <div class="input-wrap">
+    <input id="input-nome-inicio" type="text" placeholder="Digite seu nome..."
+      onkeypress="if(event.key==='Enter') entrarNoJogo()">
+    <button class="btn-jogar" onclick="entrarNoJogo()" style="padding:14px 24px;font-size:1rem;">Jogar →</button>
+  </div>
+  <div id="erro-nome-inicio" class="erro"></div>
+</div>
+
+<!-- APP -->
+<div id="app">
+<header>
+  <div class="logo">Adivinha<span>.</span>py</div>
+  <div class="header-right" style="display:flex;align-items:center;gap:16px;">
+    <span id="nome-header" style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;color:var(--accent);text-transform:capitalize;"></span>
+    <button class="theme-toggle" onclick="toggleTheme()">
+      <span id="theme-icon">🌙</span>
+      <span id="theme-label">Escuro</span>
+    </button>
+  </div>
+</header>
+
+<nav>
+  <button class="tab active" data-page="perfil" onclick="showPage('perfil', this)">Perfil</button>
+  <button class="tab" data-page="ranking" onclick="showPage('ranking', this)">Ranking</button>
+  <button class="tab" data-page="jogar" onclick="showPage('jogar', this)">Jogar</button>
+</nav>
+
+<main>
+
+  <!-- PERFIL -->
+  <div id="page-perfil" class="page active">
+    <div class="section-title">Perfil</div>
+    <p class="section-sub">Selecione um jogador para ver suas estatísticas</p>
+    <div class="player-selector" id="player-selector"></div>
+    <div id="perfil-content">
+      <div class="empty-state">
+        <div class="icon">👤</div>
+        <h3>Nenhum jogador selecionado</h3>
+        <p>Selecione um jogador acima para ver o perfil</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RANKING -->
+  <div id="page-ranking" class="page">
+    <div class="ranking-header">
+      <div>
+        <div class="section-title">Ranking</div>
+        <p class="section-sub">Os melhores jogadores</p>
+      </div>
+      <div class="ranking-filters">
+        <button class="filter-btn active" onclick="filterRanking('todos', this)">Todos</button>
+        <button class="filter-btn" onclick="filterRanking('facil', this)">Fácil</button>
+        <button class="filter-btn" onclick="filterRanking('medio', this)">Médio</button>
+        <button class="filter-btn" onclick="filterRanking('dificil', this)">Difícil</button>
+      </div>
+    </div>
+    <div id="ranking-content"></div>
+  </div>
+
+  <!-- JOGAR -->
+  <div id="page-jogar" class="page">
+    <div class="section-title">Jogar</div>
+    <p class="section-sub">Digite seu nome e escolha a dificuldade!</p>
+    <div id="jogar-content">
+
+      <!-- TELA: NOME -->
+      <div id="tela-nome" class="card" style="max-width:500px;margin:0 auto;text-align:center;">
+        <div class="card-title">Qual é o seu nome?</div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <input id="input-nome" type="text" placeholder="Digite seu nome..."
+            style="flex:1;padding:12px 16px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-family:'DM Mono',monospace;font-size:1rem;"
+            onkeypress="if(event.key==='Enter') confirmarNome()">
+          <button class="btn-jogar" onclick="confirmarNome()">OK →</button>
+        </div>
+        <div id="erro-nome" style="color:#e74c3c;font-size:0.8rem;margin-top:8px;min-height:20px;"></div>
+      </div>
+
+      <!-- TELA: DIFICULDADE -->
+      <div id="tela-dificuldade" style="display:none;max-width:500px;margin:0 auto;">
+        <div class="card" style="text-align:center;">
+          <div id="saudacao-nome" class="card-title"></div>
+          <p style="color:var(--text2);margin-bottom:20px;font-size:0.85rem;">Escolha a dificuldade</p>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <button class="filter-btn" style="padding:16px;font-size:1rem;" onclick="comecarJogo('facil')">🟢 Fácil — 1 a 50 | 12 tentativas</button>
+            <button class="filter-btn" style="padding:16px;font-size:1rem;" onclick="comecarJogo('medio')">🟡 Médio — 1 a 100 | 10 tentativas</button>
+            <button class="filter-btn" style="padding:16px;font-size:1rem;" onclick="comecarJogo('dificil')">🔴 Difícil — 1 a 150 | 8 tentativas</button>
+          </div>
+          <button onclick="voltarNome()" style="margin-top:16px;background:none;border:none;color:var(--text2);cursor:pointer;font-family:'DM Mono',monospace;font-size:0.8rem;">← Trocar nome</button>
+        </div>
+      </div>
+
+      <!-- TELA: JOGO -->
+      <div id="tela-jogo" style="display:none;max-width:500px;margin:0 auto;"></div>
+
+    </div>
+  </div>
+
+</main>
+</div> <!-- fim #app -->
+
+<script>
+  let rankingData = [];
+  let currentFilter = 'todos';
+  let numeroSecreto = 0;
+  let tentativas = 0;
+  let maxTentativas = 0;
+  let limite = 0;
+  let pontosFator = 0;
+  let jogoAtivo = false;
+  let nomeJogador = '';
+  let nivelAtual = '';
+
+  const CONQUISTAS_CONFIG = [
+    { nome: '🥉 Bronze', emoji: '🥉', pts: 50 },
+    { nome: '🥈 Prata', emoji: '🥈', pts: 100 },
+    { nome: '🥇 Ouro', emoji: '🥇', pts: 300 },
+    { nome: '💎 Diamante', emoji: '💎', pts: 500 },
+  ];
+
+  function numeroAleatorio(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  // TELA INICIAL
+  function entrarNoJogo() {
+    const input = document.getElementById('input-nome-inicio');
+    const nome = input.value.trim().toLowerCase();
+    if (!nome) {
+      document.getElementById('erro-nome-inicio').textContent = 'Digite um nome válido!';
+      return;
+    }
+    nomeJogador = nome;
+    document.getElementById('tela-inicial').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('nome-header').textContent = nome;
+    // Vai direto pra aba jogar pulando a tela de nome
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-jogar').classList.add('active');
+    document.querySelector('[data-page="jogar"]').classList.add('active');
+    document.getElementById('tela-nome').style.display = 'none';
+    document.getElementById('tela-dificuldade').style.display = 'block';
+    document.getElementById('saudacao-nome').textContent = `Bem vindo, ${nome}! 👋`;
+  }
+
+  // SALVAR NO RANKING
+  function salvarNoRanking(pontos) {
+    const encontrado = rankingData.findIndex(u => u.nome === nomeJogador && u.dificuldade === nivelAtual);
+    if (encontrado >= 0) {
+      rankingData[encontrado].pontos += pontos;
+      rankingData[encontrado].partidas_jogadas += 1;
+    } else {
+      rankingData.push({ nome: nomeJogador, pontos: pontos, partidas_jogadas: 1, dificuldade: nivelAtual, conquistas: [] });
+    }
+    rankingData.sort((a, b) => b.pontos - a.pontos);
+    renderRanking();
+    renderPlayerSelector();
+  }
+
+  // CONFIRMAR NOME
+  function confirmarNome() {
+    const input = document.getElementById('input-nome');
+    const nome = input.value.trim().toLowerCase();
+    if (!nome) {
+      document.getElementById('erro-nome').textContent = 'Por favor, digite um nome válido!';
+      return;
+    }
+    nomeJogador = nome;
+    document.getElementById('tela-nome').style.display = 'none';
+    document.getElementById('tela-dificuldade').style.display = 'block';
+    document.getElementById('saudacao-nome').textContent = `Bem vindo, ${nome}! 👋`;
+  }
+
+  function voltarNome() {
+    document.getElementById('tela-nome').style.display = 'block';
+    document.getElementById('tela-dificuldade').style.display = 'none';
+  }
+
+  function iniciarJogo(nivel) {
+    if (nivel === 'facil') { numeroSecreto = numeroAleatorio(1,50); limite=50; maxTentativas=12; pontosFator=5; }
+    else if (nivel === 'medio') { numeroSecreto = numeroAleatorio(1,100); limite=100; maxTentativas=10; pontosFator=10; }
+    else if (nivel === 'dificil') { numeroSecreto = numeroAleatorio(1,150); limite=150; maxTentativas=8; pontosFator=20; }
+    tentativas = 0;
+    jogoAtivo = true;
+    nivelAtual = nivel;
+  }
+
+  function verificarChute(chute) {
+    if (!jogoAtivo) return;
+    chute = parseInt(chute);
+    tentativas++;
+    let restante = maxTentativas - tentativas;
+    let pontos = restante * pontosFator;
+    let diferenca = Math.abs(chute - numeroSecreto);
+    if (chute === numeroSecreto) { jogoAtivo = false; return { resultado: 'ganhou', pontos, tentativas }; }
+    if (tentativas >= maxTentativas) { jogoAtivo = false; return { resultado: 'perdeu', numeroSecreto }; }
+    let dica = diferenca > 10 ? 'Está um pouco longe 😕' : diferenca > 5 ? 'Está perto! 😎' : diferenca > 2 ? 'Está muito perto! 🥵' : 'Quase! Do seu lado 😅';
+    let direcao = chute > numeroSecreto ? 'O número é menor! 👇' : 'O número é maior! 👆';
+    return { resultado: 'continua', dica, direcao, restante };
+  }
+
+  function comecarJogo(nivel) {
+    iniciarJogo(nivel);
+    document.getElementById('tela-dificuldade').style.display = 'none';
+    document.getElementById('tela-jogo').style.display = 'block';
+    document.getElementById('tela-jogo').innerHTML = `
+      <div class="card" style="text-align:center;">
+        <div class="card-title">Nível: ${nivel} — ${nomeJogador}</div>
+        <p style="margin-bottom:20px;color:var(--text2)">Adivinhe o número de 1 até ${limite}</p>
+        <div id="mensagem" style="min-height:40px;margin-bottom:16px;font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;"></div>
+        <div id="tentativas-info" style="color:var(--text2);font-size:0.8rem;margin-bottom:16px;">${maxTentativas} tentativas restantes</div>
+        <div id="input-area" style="display:flex;gap:8px;">
+          <input id="input-chute" type="number" min="1" max="${limite}" placeholder="Digite um número..."
+            style="flex:1;padding:12px 16px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-family:'DM Mono',monospace;font-size:1rem;"
+            onkeypress="if(event.key==='Enter') enviarChute()">
+          <button class="btn-jogar" onclick="enviarChute()">Chutar</button>
+        </div>
+        <div id="botoes-fim" style="display:none;margin-top:16px;display:none;gap:12px;justify-content:center;flex-wrap:wrap;"></div>
+        <button onclick="voltarDificuldade()" style="margin-top:16px;background:none;border:none;color:var(--text2);cursor:pointer;font-family:'DM Mono',monospace;font-size:0.8rem;">← Voltar</button>
+      </div>
+    `;
+    document.getElementById('input-chute').focus();
+  }
+
+  function enviarChute() {
+    const input = document.getElementById('input-chute');
+    if (!input.value) return;
+    const res = verificarChute(input.value);
+    const msg = document.getElementById('mensagem');
+    const info = document.getElementById('tentativas-info');
+    const inputArea = document.getElementById('input-area');
+    const botoesFim = document.getElementById('botoes-fim');
+
+    if (res.resultado === 'ganhou') {
+      msg.style.color = '#27ae60';
+      msg.textContent = `🎉 Parabéns, ${nomeJogador}! Você acertou em ${res.tentativas} tentativas! +${res.pontos} pontos!`;
+      info.textContent = '';
+      inputArea.style.display = 'none';
+      salvarNoRanking(res.pontos);
+      mostrarBotoesFim(botoesFim);
+    } else if (res.resultado === 'perdeu') {
+      msg.style.color = '#e74c3c';
+      msg.textContent = `😢 Suas chances acabaram! O número era ${res.numeroSecreto}`;
+      info.textContent = '';
+      inputArea.style.display = 'none';
+      mostrarBotoesFim(botoesFim);
+    } else {
+      msg.style.color = 'var(--text)';
+      msg.textContent = `${res.direcao} ${res.dica}`;
+      info.textContent = `${res.restante} tentativas restantes`;
+      input.value = '';
+      input.focus();
+    }
+  }
+
+  function mostrarBotoesFim(container) {
+    container.style.display = 'flex';
+    container.innerHTML = `
+      <button class="btn-jogar" onclick="jogarNovamente()">🔄 Jogar novamente</button>
+      <button class="btn-secondary" onclick="voltarDificuldade()">Mudar dificuldade</button>
+    `;
+  }
+
+  function jogarNovamente() {
+    comecarJogo(nivelAtual);
+  }
+
+  function voltarDificuldade() {
+    document.getElementById('tela-dificuldade').style.display = 'block';
+    document.getElementById('tela-jogo').style.display = 'none';
+    jogoAtivo = false;
+  }
+
+  function toggleTheme() {
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    document.body.setAttribute('data-theme', isDark ? '' : 'dark');
+    document.getElementById('theme-icon').textContent = isDark ? '🌙' : '☀️';
+    document.getElementById('theme-label').textContent = isDark ? 'Escuro' : 'Claro';
+  }
+
+  function showPage(page, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  async function loadData() {
+    try {
+      const res = await fetch('ranking.json');
+      const json = await res.json();
+      rankingData = json.ranking || [];
+    } catch(e) {
+      rankingData = [
+        { nome: 'irineu', pontos: 145, partidas_jogadas: 12, dificuldade: 'medio', conquistas: ['🥉 Bronze', '🥈 Prata'] },
+        { nome: 'proxy', pontos: 300, partidas_jogadas: 8, dificuldade: 'dificil', conquistas: ['🥉 Bronze', '🥈 Prata', '🥇 Ouro'] },
+        { nome: 'teste', pontos: 45, partidas_jogadas: 3, dificuldade: 'facil', conquistas: [] },
+      ];
+    }
+    renderPlayerSelector();
+    renderRanking();
+  }
+
+  function renderPlayerSelector() {
+    const players = [...new Set(rankingData.map(u => u.nome))];
+    document.getElementById('player-selector').innerHTML = players.map(p => `
+      <button class="player-chip" onclick="selectPlayer('${p}', this)"><span class="dot"></span>${p}</button>
+    `).join('');
+  }
+
+  function selectPlayer(nome, btn) {
+    document.querySelectorAll('.player-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    const entries = rankingData.filter(u => u.nome === nome);
+    const totalPontos = entries.reduce((s, u) => s + u.pontos, 0);
+    const totalPartidas = entries.reduce((s, u) => s + u.partidas_jogadas, 0);
+    const allConquistas = [...new Set(entries.flatMap(u => u.conquistas || []))];
+    document.getElementById('perfil-content').innerHTML = `
+      <div class="profile-grid">
+        <div class="profile-card">
+          <div class="avatar">${nome[0].toUpperCase()}</div>
+          <div class="profile-name">${nome}</div>
+          <div class="profile-badge">jogador</div>
+          <div class="profile-stats">
+            <div class="stat-box"><div class="stat-value">${totalPontos}</div><div class="stat-label">Pontos</div></div>
+            <div class="stat-box"><div class="stat-value">${totalPartidas}</div><div class="stat-label">Partidas</div></div>
+            <div class="stat-box"><div class="stat-value">${allConquistas.length}</div><div class="stat-label">Conquistas</div></div>
+            <div class="stat-box"><div class="stat-value">${entries.length}</div><div class="stat-label">Níveis</div></div>
+          </div>
+        </div>
+        <div class="profile-right">
+          <div class="card">
+            <div class="card-title">Conquistas</div>
+            <div class="conquistas-grid">
+              ${CONQUISTAS_CONFIG.map(c => `
+                <div class="conquista-item ${allConquistas.includes(c.nome) ? 'desbloqueada' : 'bloqueada'}">
+                  <div class="conquista-emoji">${c.emoji}</div>
+                  <div class="conquista-nome">${c.nome.split(' ').slice(1).join(' ')}</div>
+                  <div class="conquista-pts">${c.pts} pts</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Histórico por Dificuldade</div>
+            <div class="historico-list">
+              ${entries.map(e => `
+                <div class="historico-item">
+                  <span class="dificuldade-badge badge-${e.dificuldade}">${e.dificuldade}</span>
+                  <span>${e.partidas_jogadas} partidas</span>
+                  <span style="color:var(--accent);font-family:'Syne',sans-serif;font-weight:700">${e.pontos} pts</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function filterRanking(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderRanking();
+  }
+
+  function renderRanking() {
+    let data = [...rankingData];
+    if (currentFilter !== 'todos') data = data.filter(u => u.dificuldade === currentFilter);
+    data.sort((a, b) => b.pontos - a.pontos);
+    const content = document.getElementById('ranking-content');
+    if (!data.length) {
+      content.innerHTML = `<div class="empty-state"><div class="icon">🏆</div><h3>Nenhum jogador encontrado</h3><p>Jogue uma partida para aparecer no ranking!</p></div>`;
+      return;
+    }
+    content.innerHTML = `
+      <div class="ranking-table">
+        <div class="ranking-row header">
+          <span>#</span><span>Jogador</span><span>Dificuldade</span><span>Partidas</span><span>Pontos</span><span>Conquistas</span>
+        </div>
+        ${data.map((u, i) => `
+          <div class="ranking-row rank-${i+1}">
+            <span class="rank-num">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</span>
+            <span class="rank-name">${u.nome}</span>
+            <span><span class="dificuldade-badge badge-${u.dificuldade}">${u.dificuldade}</span></span>
+            <span>${u.partidas_jogadas}</span>
+            <span class="rank-points">${u.pontos}</span>
+            <span class="rank-conquistas">${(u.conquistas||[]).map(c=>[...c][0]).join(' ')||'—'}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  loadData();
+</script>
+</body>
+</html>
