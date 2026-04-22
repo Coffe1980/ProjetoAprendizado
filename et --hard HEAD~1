@@ -1,0 +1,42 @@
+[33mcommit 065340c36e0436586a339393b3dfa298e0837c27[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Seu Nome <seu-email@exemplo.com>
+Date:   Tue Apr 21 21:23:59 2026 -0300
+
+    Atualizar dashboard
+
+[33mcommit c430b7398574bab65e9a1855e9d20bb90fe62048[m
+Merge: 40e98c6 600e6d9
+Author: Seu Nome <seu-email@exemplo.com>
+Date:   Tue Apr 21 21:15:26 2026 -0300
+
+    Merge branch 'main' of https://github.com/Coffe1980/PrimeiroProjeto
+
+[33mcommit 40e98c654558ee34a2e00809f1f3f08729d95668[m
+Author: Coffee1980 <semnomeoficial91@gmail.com>
+Date:   Wed Apr 8 21:48:31 2026 -0300
+
+    atualizacao automatica
+
+[33mcommit 164f247bbc481370a25b8c605c7d34793fc23dea[m
+Author: Coffee1980 <semnomeoficial91@gmail.com>
+Date:   Wed Apr 8 20:57:02 2026 -0300
+
+    atualizacao automatica
+
+[33mcommit 787e43a202a126e7886dfcde73a6d59bb67c3f99[m
+Author: Coffee1980 <semnomeoficial91@gmail.com>
+Date:   Tue Apr 7 20:40:12 2026 -0300
+
+    adicionar script de push automatico
+
+[33mcommit 6f2277f686c24227ce31fedef9bcbe373608504a[m
+Author: Coffee1980 <semnomeoficial91@gmail.com>
+Date:   Tue Apr 7 19:39:02 2026 -0300
+
+    adicionando arquivos do projeto
+
+[33mcommit 600e6d9865e21c1dec6ea80a3b602be54c233c98[m
+Author: Proxy <102924326+Coffe1980@users.noreply.github.com>
+Date:   Tue Apr 7 19:34:26 2026 -0300
+
+    Initial commit

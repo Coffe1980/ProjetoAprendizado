@@ -1,0 +1,24 @@
+{
+    "data": "2026-04-08T21:58:20.664549",
+    "ranking": [
+        {
+            "nome": "irineu",
+            "partidas_jogadas": 2,
+            "pontos": 18800,
+            "dificuldade": "dificil",
+            "conquistas": {
+                "\ud83e\udd49 Bronze": 50,
+                "\ud83e\udd48 Prata": 100,
+                "\ud83e\udd47 Ouro": 300,
+                "\ud83d\udc8e Diamante": 500
+            }
+        },
+        {
+            "nome": "lulu",
+            "partidas_jogadas": 2,
+            "pontos": 40,
+            "dificuldade": "facil",
+            "conquistas": []
+        }
+    ]
+}
