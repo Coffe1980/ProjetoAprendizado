@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jogo de Adivinhação — Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -24,12 +25,12 @@
   .logo span { color: var(--accent); }
   .theme-toggle { background: var(--bg2); border: 1px solid var(--border); border-radius: 50px; padding: 8px 16px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text); transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
   nav { display: flex; padding: 0 40px; background: var(--card); border-bottom: 1px solid var(--border); gap: 4px; }
-  .tab { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.85rem; padding: 16px 24px; cursor: pointer; border: none; background: transparent; color: var(--text2); letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.85rem; padding: 16px 24px; cursor: pointer; border: none; background: transparent; color: var(--text); letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid transparent; transition: all 0.2s; }
   .tab:hover { color: var(--text); }
   .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
   main { max-width: 1100px; margin: 0 auto; padding: 40px; }
-  .page { display: none; animation: fadeIn 0.3s ease; }
-  .page.active { display: block; }
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.4s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   .section-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem; margin-bottom: 8px; letter-spacing: -1px; }
   .section-sub { color: var(--text2); font-size: 0.85rem; margin-bottom: 32px; }
@@ -116,6 +117,83 @@
   }
   #tela-inicial .erro { color: #e74c3c; font-size: 0.8rem; min-height: 20px; }
   #app { display: none; }
+
+/* ANIMAÇÕES */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+@keyframes flash-red {
+  0%, 100% { background: var(--card); }
+  50% { background: rgba(231, 76, 60, 0.2); }
+}
+
+.shake { animation: shake 0.4s ease; }
+.flash-red { animation: flash-red 0.4s ease; }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.page.active { animation: slideIn 0.3s ease; }
+  
+@keyframes flash-green {
+  0%, 100% { background: var(--card); }
+  50% { background: rgba(39, 174, 96, 0.2); }
+}
+
+.flash-green { animation: flash-green 0.5s ease; }
+
+@keyframes medalha {
+    0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.3) rotate(360deg); opacity: 1; }
+    80% { transform: translate(-50%, -50%) scale(1) rotate(380deg); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0) rotate(400deg); opacity: 0; }
+}
+
+.medalha-animacao {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    font-size: 8rem;
+    z-index: 9999;
+    animation: medalha 2s ease forwards;
+    pointer-events: none;
+}
+
+/* TOAST DE CONQUISTA */
+.toast-conquista {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--card);
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    z-index: 9998;
+    animation: slideToast 0.4s ease, fadeOut 0.4s ease 3.6s forwards;
+    max-width: 300px;
+}
+
+@keyframes slideToast {
+    from { opacity: 0; transform: translateX(100px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
 </style>
 </head>
 <body>
@@ -213,7 +291,7 @@
             <button class="filter-btn" style="padding:16px;font-size:1rem;" onclick="comecarJogo('medio')">🟡 Médio — 1 a 100 | 10 tentativas</button>
             <button class="filter-btn" style="padding:16px;font-size:1rem;" onclick="comecarJogo('dificil')">🔴 Difícil — 1 a 150 | 8 tentativas</button>
           </div>
-          <button onclick="voltarNome()" style="margin-top:16px;background:none;border:none;color:var(--text2);cursor:pointer;font-family:'DM Mono',monospace;font-size:0.8rem;">← Trocar nome</button>
+          <button onclick="trocarJogador()" style="margin-top:16px;background:none;border:none;color:var(--text2);cursor:pointer;font-family:'DM Mono',monospace;font-size:0.8rem;">👤 Não sou eu</button>
         </div>
       </div>
 
@@ -249,6 +327,14 @@
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
+function mostrarMedalha(emoji) {
+    const el = document.createElement('div');
+    el.className = 'medalha-animacao';
+    el.textContent = emoji;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+}
+
   // TELA INICIAL
   function entrarNoJogo() {
     const input = document.getElementById('input-nome-inicio');
@@ -258,6 +344,7 @@
       return;
     }
     nomeJogador = nome;
+    localStorage.setItem('nomeJogador', nome);
     document.getElementById('tela-inicial').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     document.getElementById('nome-header').textContent = nome;
@@ -272,18 +359,42 @@
   }
 
   // SALVAR NO RANKING
-  function salvarNoRanking(pontos) {
-    const encontrado = rankingData.findIndex(u => u.nome === nomeJogador && u.dificuldade === nivelAtual);
-    if (encontrado >= 0) {
-      rankingData[encontrado].pontos += pontos;
-      rankingData[encontrado].partidas_jogadas += 1;
-    } else {
-      rankingData.push({ nome: nomeJogador, pontos: pontos, partidas_jogadas: 1, dificuldade: nivelAtual, conquistas: [] });
-    }
-    rankingData.sort((a, b) => b.pontos - a.pontos);
+  async function salvarNoRanking(pontos) {
+    const res = await fetch('/salvar_ranking', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({nome: nomeJogador, nivel: nivelAtual, pontos: pontos})
+    });
+    const dados = await res.json();
+    rankingData = dados.ranking;
     renderRanking();
     renderPlayerSelector();
-  }
+}
+
+async function salvarNoRanking(pontos) {
+    const res = await fetch('/salvar_ranking', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({nome: nomeJogador, nivel: nivelAtual, pontos: pontos})
+    });
+    const dados = await res.json();
+    rankingData = dados.ranking;
+    renderRanking();
+    renderPlayerSelector();
+    
+    // Verifica conquistas e mostra animação
+    const usuario = rankingData.find(u => u.nome === nomeJogador);
+    if (usuario) {
+        const totalPontos = rankingData
+            .filter(u => u.nome === nomeJogador)
+            .reduce((s, u) => s + u.pontos, 0);
+        
+        if (totalPontos >= 500) mostrarMedalha('💎');
+        else if (totalPontos >= 300) mostrarMedalha('🥇');
+        else if (totalPontos >= 100) mostrarMedalha('🥈');
+        else if (totalPontos >= 50) mostrarMedalha('🥉');
+    }
+}
 
   // CONFIRMAR NOME
   function confirmarNome() {
@@ -304,31 +415,91 @@
     document.getElementById('tela-dificuldade').style.display = 'none';
   }
 
-  function iniciarJogo(nivel) {
-    if (nivel === 'facil') { numeroSecreto = numeroAleatorio(1,50); limite=50; maxTentativas=12; pontosFator=5; }
-    else if (nivel === 'medio') { numeroSecreto = numeroAleatorio(1,100); limite=100; maxTentativas=10; pontosFator=10; }
-    else if (nivel === 'dificil') { numeroSecreto = numeroAleatorio(1,150); limite=150; maxTentativas=8; pontosFator=20; }
+  function trocarJogador() {
+    localStorage.removeItem('nomeJogador');
+    nomeJogador = '';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('tela-inicial').style.display = 'flex';
+    document.getElementById('input-nome-inicio').value = '';
+}
+
+async function iniciarJogo(nivel) {
+    const res = await fetch('/iniciar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({nivel: nivel})
+    });
+    const dados = await res.json();
+    limite = dados.limite;
+    maxTentativas = dados.max_tentativas;
     tentativas = 0;
     jogoAtivo = true;
     nivelAtual = nivel;
-  }
+    nivelAtual = dados.nivel
+}
 
-  function verificarChute(chute) {
-    if (!jogoAtivo) return;
-    chute = parseInt(chute);
-    tentativas++;
-    let restante = maxTentativas - tentativas;
-    let pontos = restante * pontosFator;
-    let diferenca = Math.abs(chute - numeroSecreto);
-    if (chute === numeroSecreto) { jogoAtivo = false; return { resultado: 'ganhou', pontos, tentativas }; }
-    if (tentativas >= maxTentativas) { jogoAtivo = false; return { resultado: 'perdeu', numeroSecreto }; }
-    let dica = diferenca > 10 ? 'Está um pouco longe 😕' : diferenca > 5 ? 'Está perto! 😎' : diferenca > 2 ? 'Está muito perto! 🥵' : 'Quase! Do seu lado 😅';
-    let direcao = chute > numeroSecreto ? 'O número é menor! 👇' : 'O número é maior! 👆';
-    return { resultado: 'continua', dica, direcao, restante };
-  }
+  async function enviarChute() {
+    const input = document.getElementById('input-chute');
+    if (!input.value) return;
+    
+    const valor = parseInt(input.value);
+    if (valor < 1 || valor > limite) {
+        mostrarDialogo(`❌ Número inválido! O limite é de 1 até ${limite}.`);
+        return;
+    }
 
-  function comecarJogo(nivel) {
-    iniciarJogo(nivel);
+    const res = await fetch('/chutar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({numero: parseInt(input.value)})
+
+    });
+    
+    const resultado = await res.json();
+    const msg = document.getElementById('mensagem');
+    const info = document.getElementById('tentativas-info');
+    const inputArea = document.getElementById('input-area');
+    const botoesFim = document.getElementById('botoes-fim');
+
+if (resultado.resultado === 'ganhou') {
+    msg.style.color = '#27ae60';
+    msg.textContent = `🎉 Parabéns, ${nomeJogador}! Você acertou em ${resultado.tentativas} tentativas! +${resultado.pontos} pontos!`;
+    info.textContent = '';
+    inputArea.style.display = 'none';
+    salvarNoRanking(resultado.pontos);
+    mostrarBotoesFim(botoesFim);
+    piscarCard('green');
+} else if (resultado.resultado === 'perdeu') {
+    msg.style.color = '#e74c3c';
+    msg.textContent = `😢 Suas chances acabaram! O número era ${resultado.numero_secreto}`;
+    info.textContent = '';
+    inputArea.style.display = 'none';
+    mostrarBotoesFim(botoesFim);
+    piscarCard('red');
+} else {
+    msg.style.color = 'var(--text)';
+    msg.textContent = `${resultado.direcao} ${resultado.dica}`;
+    info.textContent = `${resultado.restante} tentativas restantes`;
+    input.value = '';
+    input.focus();
+    piscarCard('red');
+}
+
+// AN AO ERRAR.
+
+function piscarCard(cor) {
+    const card = document.querySelector('#tela-jogo .card');
+    if (!card) return;
+    const classes = cor === 'red' ? ['shake', 'flash-red'] : ['flash-green'];
+    card.classList.remove('shake', 'flash-red', 'flash-green');
+    void card.offsetWidth;
+    card.classList.add(...classes);
+    setTimeout(() => card.classList.remove('shake', 'flash-red', 'flash-green'), 500);
+}
+}
+
+  async function comecarJogo(nivel) {
+    await iniciarJogo(nivel);
     document.getElementById('tela-dificuldade').style.display = 'none';
     document.getElementById('tela-jogo').style.display = 'block';
     document.getElementById('tela-jogo').innerHTML = `
@@ -350,37 +521,6 @@
     document.getElementById('input-chute').focus();
   }
 
-  function enviarChute() {
-    const input = document.getElementById('input-chute');
-    if (!input.value) return;
-    const res = verificarChute(input.value);
-    const msg = document.getElementById('mensagem');
-    const info = document.getElementById('tentativas-info');
-    const inputArea = document.getElementById('input-area');
-    const botoesFim = document.getElementById('botoes-fim');
-
-    if (res.resultado === 'ganhou') {
-      msg.style.color = '#27ae60';
-      msg.textContent = `🎉 Parabéns, ${nomeJogador}! Você acertou em ${res.tentativas} tentativas! +${res.pontos} pontos!`;
-      info.textContent = '';
-      inputArea.style.display = 'none';
-      salvarNoRanking(res.pontos);
-      mostrarBotoesFim(botoesFim);
-    } else if (res.resultado === 'perdeu') {
-      msg.style.color = '#e74c3c';
-      msg.textContent = `😢 Suas chances acabaram! O número era ${res.numeroSecreto}`;
-      info.textContent = '';
-      inputArea.style.display = 'none';
-      mostrarBotoesFim(botoesFim);
-    } else {
-      msg.style.color = 'var(--text)';
-      msg.textContent = `${res.direcao} ${res.dica}`;
-      info.textContent = `${res.restante} tentativas restantes`;
-      input.value = '';
-      input.focus();
-    }
-  }
-
   function mostrarBotoesFim(container) {
     container.style.display = 'flex';
     container.innerHTML = `
@@ -388,6 +528,21 @@
       <button class="btn-secondary" onclick="voltarDificuldade()">Mudar dificuldade</button>
     `;
   }
+
+  function mostrarDialogo(mensagem) {
+    const dialogo = document.createElement('div');
+    dialogo.style.cssText = `
+        position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+        background:var(--card); border:1px solid var(--border); border-radius:16px;
+        padding:32px; text-align:center; z-index:999; box-shadow:var(--shadow);
+        font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; max-width:320px;
+    `;
+    dialogo.innerHTML = `
+        <p style="margin-bottom:20px;">${mensagem}</p>
+        <button class="btn-jogar" onclick="this.parentElement.remove()">Fechar</button>
+    `;
+    document.body.appendChild(dialogo);
+}
 
   function jogarNovamente() {
     comecarJogo(nivelAtual);
@@ -413,9 +568,25 @@
     btn.classList.add('active');
   }
 
+// Verifica se já tem nome salvo
+const nomeSalvo = localStorage.getItem('nomeJogador');
+if (nomeSalvo) {
+    nomeJogador = nomeSalvo;
+    document.getElementById('tela-inicial').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('nome-header').textContent = nomeSalvo;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-jogar').classList.add('active');
+    document.querySelector('[data-page="jogar"]').classList.add('active');
+    document.getElementById('tela-nome').style.display = 'none';
+    document.getElementById('tela-dificuldade').style.display = 'block';
+    document.getElementById('saudacao-nome').textContent = `Bem vindo de volta, ${nomeSalvo}! 👋`;
+}
+  
   async function loadData() {
     try {
-      const res = await fetch('ranking.json');
+      const res = await fetch('/ranking');
       const json = await res.json();
       rankingData = json.ranking || [];
     } catch(e) {
